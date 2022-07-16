@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package anime;
+
+option go_package = "animepb";
+
+service DatabaseAnime {
+    // CreateAnime: Creates a new anime.
+    rpc CreateAnime(CreateAnimeRequest) returns (CreateAnimeResponse);
+    // GetAnime: Gets an anime by ID.
+    rpc GetAnime(GetAnimeRequest) returns (GetAnimeResponse);
+    // ListAnime: Lists all anime.
+    rpc ListAnime(ListAnimeRequest) returns (stream ListAnimeResponse);
+    // UpdateAnime: Updates an anime.
+    rpc UpdateAnime(UpdateAnimeRequest) returns (UpdateAnimeResponse);
+    // DeleteAnime: Deletes an anime.
+    rpc DeleteAnime(DeleteAnimeRequest) returns (DeleteAnimeResponse);
+}
+
+message Anime {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string image_url = 4;
+    string created_at = 5;
+    string updated_at = 6;
+}
+
