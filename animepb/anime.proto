@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package anime;
+import "google/protobuf/timestamp.proto";
 
 option go_package = "animepb";
 
@@ -8,8 +9,8 @@ message Anime {
     string id = 1;
     string name = 2;
     string description = 3;
-    string created_at = 4;
-    string updated_at = 5;
+    google.protobuf.Timestamp  created_at = 4;
+    google.protobuf.Timestamp  updated_at = 5;
 }
 
 message CreateAnimeRequest {
@@ -20,7 +21,7 @@ message CreateAnimeResponse {
     Anime anime = 1;
 }
 message ReadAnimeRequest {
-    string id = 1;
+    string anime_id = 1;
 }
 
 message ReadAnimeResponse {
@@ -44,11 +45,11 @@ message UpdateAnimeResponse {
 }
 
 message DeleteAnimeRequest {
-    string id = 1;
+    string anime_id = 1;
 }
 
 message DeleteAnimeResponse {
-    string id = 1;
+    string anime_id = 1;
 }
 
 service DatabaseAnime {

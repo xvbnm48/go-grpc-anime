@@ -15,18 +15,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/internal/status"
+
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var collection *mongo.Collection
 
 type server struct{}
 type animeItem struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Name        string             `bson:"name"`
-	Description string             `bson:"description"`
-	CreatedAt   time.Time          `bson:"created_at"`
-	UpdatedAt   time.Time          `bson:"updated_at"`
+	ID          primitive.ObjectID     `bson:"_id,omitempty"`
+	Name        string                 `bson:"name"`
+	Description string                 `bson:"description"`
+	CreatedAt   *timestamppb.Timestamp `bson:"createdAt"`
+	UpdatedAt   *timestamppb.Timestamp `bson:"updatedAt"`
 }
 
 func (*server) CreateAnime(ctx context.Context, req *animepb.CreateAnimeRequest) (*animepb.CreateAnimeResponse, error) {
@@ -35,8 +38,8 @@ func (*server) CreateAnime(ctx context.Context, req *animepb.CreateAnimeRequest)
 	data := animeItem{
 		Name:        anime.GetName(),
 		Description: anime.GetDescription(),
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		CreatedAt:   timestamppb.New(time.Now()),
+		UpdatedAt:   timestamppb.New(time.Now()),
 	}
 
 	res, err := collection.InsertOne(context.TODO(), data)
@@ -63,7 +66,37 @@ func (*server) CreateAnime(ctx context.Context, req *animepb.CreateAnimeRequest)
 			UpdatedAt:   anime.GetUpdatedAt(),
 		},
 	}, nil
+}
 
+func (*server) ReadAnime(ctx context.Context, req *animepb.ReadAnimeRequest) (*animepb.ReadAnimeResponse, error) {
+	fmt.Println("Read Anime!")
+	animeId := req.GetAnimeId()
+	oid, err := primitive.ObjectIDFromHex(animeId)
+	if err != nil {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			fmt.Sprintf("Cannot parse ID"),
+		)
+	}
+	// create an empty struct
+	data := &animeItem{}
+	res := collection.FindOne(context.Background(), bson.M{"_id": oid}).Decode(data)
+	if res != nil {
+		return nil, status.Errorf(
+			codes.NotFound,
+			fmt.Sprintf("Cannot find anime with specified ID: %v", err),
+		)
+	}
+
+	return &animepb.ReadAnimeResponse{
+		Anime: &animepb.Anime{
+			Id:          data.ID.Hex(),
+			Name:        data.Name,
+			Description: data.Description,
+			CreatedAt:   data.CreatedAt,
+			UpdatedAt:   data.UpdatedAt,
+		},
+	}, nil
 }
 
 func main() {
