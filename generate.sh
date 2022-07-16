@@ -1,0 +1,1 @@
+protoc animepb/anime.proto --go_out=plugins=grpc:.

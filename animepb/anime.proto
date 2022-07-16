@@ -4,11 +4,58 @@ package anime;
 
 option go_package = "animepb";
 
+message Anime {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string created_at = 4;
+    string updated_at = 5;
+}
+
+message CreateAnimeRequest {
+    Anime anime = 1;
+}
+
+message CreateAnimeResponse {
+    Anime anime = 1;
+}
+message ReadAnimeRequest {
+    string id = 1;
+}
+
+message ReadAnimeResponse {
+    Anime anime = 1;
+}
+
+message ListAnimeRequest {
+
+}
+
+message ListAnimeResponse {
+    Anime anime = 1;
+}
+
+message UpdateAnimeRequest {
+    Anime anime = 1;
+}
+
+message UpdateAnimeResponse {
+    Anime anime = 1;
+}
+
+message DeleteAnimeRequest {
+    string id = 1;
+}
+
+message DeleteAnimeResponse {
+    string id = 1;
+}
+
 service DatabaseAnime {
     // CreateAnime: Creates a new anime.
     rpc CreateAnime(CreateAnimeRequest) returns (CreateAnimeResponse);
-    // GetAnime: Gets an anime by ID.
-    rpc GetAnime(GetAnimeRequest) returns (GetAnimeResponse);
+    // ReadAnime: Gets an anime by ID.
+    rpc ReadAnime(ReadAnimeRequest) returns (ReadAnimeResponse);
     // ListAnime: Lists all anime.
     rpc ListAnime(ListAnimeRequest) returns (stream ListAnimeResponse);
     // UpdateAnime: Updates an anime.
@@ -17,12 +64,5 @@ service DatabaseAnime {
     rpc DeleteAnime(DeleteAnimeRequest) returns (DeleteAnimeResponse);
 }
 
-message Anime {
-    string id = 1;
-    string name = 2;
-    string description = 3;
-    string image_url = 4;
-    string created_at = 5;
-    string updated_at = 6;
-}
+
 
