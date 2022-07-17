@@ -56,7 +56,7 @@ service DatabaseAnime {
     // CreateAnime: Creates a new anime.
     rpc CreateAnime(CreateAnimeRequest) returns (CreateAnimeResponse);
     // ReadAnime: Gets an anime by ID.
-    rpc ReadAnime(ReadAnimeRequest) returns (ReadAnimeResponse);
+    rpc GetAnimeData(ReadAnimeRequest) returns (ReadAnimeResponse);
     // ListAnime: Lists all anime.
     rpc ListAnime(ListAnimeRequest) returns (stream ListAnimeResponse);
     // UpdateAnime: Updates an anime.

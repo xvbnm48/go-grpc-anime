@@ -68,7 +68,7 @@ func (*server) CreateAnime(ctx context.Context, req *animepb.CreateAnimeRequest)
 	}, nil
 }
 
-func (*server) ReadAnime(ctx context.Context, req *animepb.ReadAnimeRequest) (*animepb.ReadAnimeResponse, error) {
+func (*server) GetAnimeData(ctx context.Context, req *animepb.ReadAnimeRequest) (*animepb.ReadAnimeResponse, error) {
 	fmt.Println("Read Anime!")
 	animeId := req.GetAnimeId()
 	oid, err := primitive.ObjectIDFromHex(animeId)
