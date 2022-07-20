@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package anime;
-import "google/protobuf/timestamp.proto";
+// import "google/protobuf/timestamp.proto";
 
 option go_package = "animepb";
 
@@ -9,8 +9,8 @@ message Anime {
     string id = 1;
     string name = 2;
     string description = 3;
-    google.protobuf.Timestamp  created_at = 4;
-    google.protobuf.Timestamp  updated_at = 5;
+    // google.protobuf.Timestamp  created_at = 4;
+    // google.protobuf.Timestamp  updated_at = 5;
 }
 
 message CreateAnimeRequest {
@@ -58,11 +58,11 @@ service DatabaseAnime {
     // ReadAnime: Gets an anime by ID.
     rpc GetAnimeData(ReadAnimeRequest) returns (ReadAnimeResponse);
     // ListAnime: Lists all anime.
-    rpc ListAnime(ListAnimeRequest) returns (stream ListAnimeResponse);
+    // rpc ListAnime(ListAnimeRequest) returns (stream ListAnimeResponse);
     // UpdateAnime: Updates an anime.
-    rpc UpdateAnime(UpdateAnimeRequest) returns (UpdateAnimeResponse);
+    // rpc UpdateAnime(UpdateAnimeRequest) returns (UpdateAnimeResponse);
     // DeleteAnime: Deletes an anime.
-    rpc DeleteAnime(DeleteAnimeRequest) returns (DeleteAnimeResponse);
+    // rpc DeleteAnime(DeleteAnimeRequest) returns (DeleteAnimeResponse);
 }
 
 

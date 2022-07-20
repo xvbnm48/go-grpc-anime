@@ -15,9 +15,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/reflection"
 
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -25,11 +25,11 @@ var collection *mongo.Collection
 
 type server struct{}
 type animeItem struct {
-	ID          primitive.ObjectID     `bson:"_id,omitempty"`
-	Name        string                 `bson:"name"`
-	Description string                 `bson:"description"`
-	CreatedAt   *timestamppb.Timestamp `bson:"createdAt"`
-	UpdatedAt   *timestamppb.Timestamp `bson:"updatedAt"`
+	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	Name        string             `bson:"name"`
+	Description string             `bson:"description"`
+	// CreatedAt   *timestamppb.Timestamp `bson:"createdAt"`
+	// UpdatedAt   *timestamppb.Timestamp `bson:"updatedAt"`
 }
 
 func (*server) CreateAnime(ctx context.Context, req *animepb.CreateAnimeRequest) (*animepb.CreateAnimeResponse, error) {
@@ -38,11 +38,9 @@ func (*server) CreateAnime(ctx context.Context, req *animepb.CreateAnimeRequest)
 	data := animeItem{
 		Name:        anime.GetName(),
 		Description: anime.GetDescription(),
-		CreatedAt:   timestamppb.New(time.Now()),
-		UpdatedAt:   timestamppb.New(time.Now()),
 	}
 
-	res, err := collection.InsertOne(context.TODO(), data)
+	res, err := collection.InsertOne(context.Background(), data)
 	if err != nil {
 		return nil, status.Errorf(
 			codes.Internal,
@@ -53,17 +51,14 @@ func (*server) CreateAnime(ctx context.Context, req *animepb.CreateAnimeRequest)
 	if !ok {
 		return nil, status.Errorf(
 			codes.Internal,
-			fmt.Sprintf("Cannot convert to OID"),
+			fmt.Sprintf("Cannot convert to OID : %v", err),
 		)
 	}
-
 	return &animepb.CreateAnimeResponse{
 		Anime: &animepb.Anime{
 			Id:          oid.Hex(),
 			Name:        anime.GetName(),
 			Description: anime.GetDescription(),
-			CreatedAt:   anime.GetCreatedAt(),
-			UpdatedAt:   anime.GetUpdatedAt(),
 		},
 	}, nil
 }
@@ -75,7 +70,7 @@ func (*server) GetAnimeData(ctx context.Context, req *animepb.ReadAnimeRequest) 
 	if err != nil {
 		return nil, status.Errorf(
 			codes.InvalidArgument,
-			fmt.Sprintf("Cannot parse ID"),
+			fmt.Sprintf("Cannot parse ID %v", err),
 		)
 	}
 	// create an empty struct
@@ -93,8 +88,6 @@ func (*server) GetAnimeData(ctx context.Context, req *animepb.ReadAnimeRequest) 
 			Id:          data.ID.Hex(),
 			Name:        data.Name,
 			Description: data.Description,
-			CreatedAt:   data.CreatedAt,
-			UpdatedAt:   data.UpdatedAt,
 		},
 	}, nil
 }
@@ -126,6 +119,7 @@ func main() {
 	opts := []grpc.ServerOption{}
 
 	s := grpc.NewServer(opts...)
+	reflection.Register(s)
 
 	animepb.RegisterDatabaseAnimeServer(s, &server{})
 	go func() {
