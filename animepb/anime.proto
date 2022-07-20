@@ -52,17 +52,19 @@ message DeleteAnimeResponse {
     string anime_id = 1;
 }
 
+
 service DatabaseAnime {
     // CreateAnime: Creates a new anime.
     rpc CreateAnime(CreateAnimeRequest) returns (CreateAnimeResponse);
     // ReadAnime: Gets an anime by ID.
     rpc GetAnimeData(ReadAnimeRequest) returns (ReadAnimeResponse);
+    
+    // UpdateAnime: Updates an anime.
+    rpc UpdateAnime(UpdateAnimeRequest) returns (UpdateAnimeResponse);
+    // DeleteAnime: Deletes an anime.
+    rpc DeleteAnime(DeleteAnimeRequest) returns (DeleteAnimeResponse);
     // ListAnime: Lists all anime.
     // rpc ListAnime(ListAnimeRequest) returns (stream ListAnimeResponse);
-    // UpdateAnime: Updates an anime.
-    // rpc UpdateAnime(UpdateAnimeRequest) returns (UpdateAnimeResponse);
-    // DeleteAnime: Deletes an anime.
-    // rpc DeleteAnime(DeleteAnimeRequest) returns (DeleteAnimeResponse);
 }
 
 

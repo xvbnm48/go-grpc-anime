@@ -92,6 +92,74 @@ func (*server) GetAnimeData(ctx context.Context, req *animepb.ReadAnimeRequest) 
 	}, nil
 }
 
+func (*server) UpdateAnime(ctx context.Context, req *animepb.UpdateAnimeRequest) (*animepb.UpdateAnimeResponse, error) {
+	fmt.Println("Update Anime!")
+	anime := req.GetAnime()
+	oid, err := primitive.ObjectIDFromHex(anime.GetId())
+	if err != nil {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			fmt.Sprintf("Cannot parse ID %v", err),
+		)
+	}
+
+	data := &animeItem{}
+	res := collection.FindOne(context.Background(), bson.M{"_id": oid}).Decode(data)
+	if res != nil {
+		return nil, status.Errorf(
+			codes.NotFound,
+			fmt.Sprintf("Cannot find anime with specified ID: %v", err),
+		)
+	}
+	data.Name = anime.GetName()
+	data.Description = anime.GetDescription()
+	_, err = collection.UpdateOne(context.Background(), bson.M{"_id": oid}, bson.M{"$set": data})
+	if err != nil {
+		return nil, status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("Cannot update anime: %v", err),
+		)
+	}
+
+	return &animepb.UpdateAnimeResponse{
+		Anime: &animepb.Anime{
+			Id:          data.ID.Hex(),
+			Name:        data.Name,
+			Description: data.Description,
+		},
+	}, nil
+}
+
+func (*server) DeleteAnime(ctx context.Context, req *animepb.DeleteAnimeRequest) (*animepb.DeleteAnimeResponse, error) {
+	fmt.Println("Delete Anime!")
+	oid, err := primitive.ObjectIDFromHex(req.GetAnimeId())
+	if err != nil {
+		return nil, status.Errorf(
+			codes.InvalidArgument,
+			fmt.Sprintf("Cannot parse ID %v", err),
+		)
+	}
+
+	filter := bson.M{"_id": oid}
+	res, err := collection.DeleteOne(context.Background(), filter)
+	if err != nil {
+		return nil, status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("Cannot delete anime: %v", err),
+		)
+	}
+
+	if res.DeletedCount == 0 {
+		return nil, status.Errorf(
+			codes.NotFound,
+			fmt.Sprintf("Cannot find anime with specified ID: %v", err),
+		)
+	}
+	return &animepb.DeleteAnimeResponse{
+		AnimeId: req.GetAnimeId(),
+	}, nil
+}
+
 func main() {
 	// if crash the program, print the error message
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
